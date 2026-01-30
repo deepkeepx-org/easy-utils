@@ -144,19 +144,19 @@ public class ApiBackUtils {
 	/**
 	 * save result
 	 */
-	public static ApiBackUtils save(){
+	public static ApiBackUtils submit(){
 		return success("保存成功", null);
 	}
-	public static ApiBackUtils save(Integer res){
-		return save(res == 1);
+	public static ApiBackUtils submit(Integer res){
+		return submit(res == 1);
 	}
-	public static ApiBackUtils save(Integer res, Object data){
-		return save(res == 1, data);
+	public static ApiBackUtils submit(Integer res, Object data){
+		return submit(res == 1, data);
 	}
-	public static ApiBackUtils save(Boolean res){
-		return save(res, null);
+	public static ApiBackUtils submit(Boolean res){
+		return submit(res, null);
 	}
-	public static ApiBackUtils save(Boolean res, Object data){
+	public static ApiBackUtils submit(Boolean res, Object data){
 		return res ? success("保存成功", data) : error("保存失败");
 	}
 

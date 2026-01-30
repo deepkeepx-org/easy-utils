@@ -1,27 +1,44 @@
 package com.deepkeepx.jar.utils.base;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 
 /**
- * &#064;Description:  TODO
- * &#064;Author:  LiuGangGang
- * &#064;PackageName  deepkeepx-utils
- * &#064;Package  com.deepkeepx.jar.utils.base
- * &#064;Date:  Created in 01:38 2025/9/27
- * &#064;Version  1.0.0
+ * Utility class for number-related operations.
+ *
+ * @author deepkeepx
+ * @version 1.0.1
  */
 public class NumberUtils {
 
     /**
-     * Randomly generate numbers within a specified range.
+     * Generates a random integer within a specified range.
      *
-     * @param min number
-     * @param max number
-     * @return random number
+     * @param min the lower bound (inclusive)
+     * @param max the upper bound (inclusive)
+     * @return a random integer between min and max
      */
     public static int random(int min, int max) {
         Random random = new Random();
         return random.nextInt(max - min + 1) + min;
+    }
+
+    /**
+     * Performs high-precision division and rounds the result.
+     *
+     * @param num     the dividend
+     * @param divisor the divisor
+     * @param scale   the number of decimal places to retain
+     * @return the rounded result as BigDecimal
+     * @throws IllegalArgumentException if divisor is zero
+     */
+    private static BigDecimal divideAndRound(double num, int divisor, int scale) {
+        if (divisor == 0) {
+            throw new IllegalArgumentException("Divisor cannot be zero");
+        }
+        BigDecimal bd = new BigDecimal(num);
+        return bd.divide(new BigDecimal(divisor), scale, RoundingMode.HALF_UP);
     }
 
 }

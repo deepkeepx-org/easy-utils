@@ -1,7 +1,12 @@
 package com.deepkeepx.jar.utils.file;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * This class is about file manipulation.
@@ -37,20 +42,19 @@ public class FileUtils {
 		try {
 			File file = new File(filePath);
 			if (!file.getParentFile().exists()) {
-				file.getParentFile().mkdirs();
-			}
+                if (!file.getParentFile().mkdirs()) {
+                    return false;
+                }
+            }
 			if(file.exists()){
 				if(isCover){
-					file.delete();
-					file.createNewFile();
-					return true;
+					return file.delete() && file.createNewFile();
 				} else {
 					System.out.println("File already exists!");
 					return false;
 				}
 			} else {
-				file.createNewFile();
-				return true;
+				return file.createNewFile();
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -164,8 +168,7 @@ public class FileUtils {
 		try {
 			File file = new File(filePath);
 			if(file.exists()){
-				file.delete();
-				return true;
+				return file.delete();
 			} else {
 				return false;
 			}
@@ -216,5 +219,47 @@ public class FileUtils {
 	public static String download(String saveDirPath, String fileUrl) {
 		return "";
 	}
+
+    /**
+     * 将指定的文件列表压缩到zip文件中
+     *
+     * @param filePaths 要压缩的文件路径列表
+     * @param zipFilePath 目标zip文件的路径
+     * @return 压缩操作是否成功，成功返回true，失败返回false
+     */
+    public static boolean zip(List<String> filePaths, String zipFilePath) {
+        try (ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFilePath)))) {
+            for (String filePath : filePaths) {
+                File fileToZip = new File(filePath);
+
+                // 检查文件是否存在
+                if (!fileToZip.exists()) {
+                    System.out.println("File " + filePath + " does not exist.");
+                    continue;
+                }
+
+                // 创建zip条目，可以添加相对路径
+                ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                zipOut.putNextEntry(zipEntry);
+
+                // 将文件内容复制到zip输出流
+                try (FileInputStream fis = new FileInputStream(fileToZip)) {
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = fis.read(buffer)) > 0) {
+                        zipOut.write(buffer, 0, length);
+                    }
+                }
+
+                zipOut.closeEntry();
+                System.out.println("File " + filePath + " has been zipped.");
+            }
+            return true; // 成功完成压缩
+        } catch (IOException e) {
+            System.out.println("Error during zip operation: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 }

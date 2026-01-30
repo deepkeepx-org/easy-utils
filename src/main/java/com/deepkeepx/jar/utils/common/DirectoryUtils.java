@@ -23,7 +23,7 @@ public class DirectoryUtils {
 		try {
 			File f = new File(dirPath);
 			if (!f.getParentFile().exists()) {
-				f.getParentFile().mkdirs();
+                return f.getParentFile().mkdirs();
 			}
 			return true;
 		} catch (Exception e) {
@@ -43,7 +43,9 @@ public class DirectoryUtils {
 		try {
 			File f = new File(targetDirPath);
 			if (!f.getParentFile().exists()) {
-				f.getParentFile().mkdirs();
+				if(!f.getParentFile().mkdirs()){
+                    return false;
+                };
 			}
 			Path sourceDirectory = Paths.get(originalDirPath);
 			Path targetDirectory = Paths.get(targetDirPath);
@@ -59,22 +61,43 @@ public class DirectoryUtils {
 	 * This method is used to delete a directory.
 	 *
 	 * @param dirPath the directory path to be deleted
+     * @return true if the directory is del successfully, false otherwise
 	 */
-	public static void del(String dirPath) {
-		File directory = new File(dirPath);
-		if (directory.exists()) {
-			File[] files = directory.listFiles();
-			if (null != files) {
-				for (File file : files) {
-					if (file.isDirectory()) {
-						del(file.getPath());
-					} else {
-						file.delete();
-					}
-				}
-			}
-		}
-		directory.delete();
+	public static boolean del(String dirPath) {
+        if (dirPath == null || dirPath.trim().isEmpty()) {
+            return false;
+        }
+        File directory = new File(dirPath);
+        if (isPathTraversal(dirPath)) { // Check path security to prevent path traversal attacks
+            System.err.println("Dangerous path, there may be path traversal attacks: " + dirPath);
+            return false;
+        }
+        if (!directory.exists()) {
+            return true;
+        }
+        if (!directory.isDirectory()) {
+            return directory.delete();
+        }
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    if (!del(file.getPath())) {
+                        return false;
+                    }
+                } else {
+                    if (!file.delete()) {
+                        System.err.println("Failed to delete file: " + file.getPath());
+                        return false;
+                    }
+                }
+            }
+        }
+        boolean dirDeleted = directory.delete();
+        if (!dirDeleted) {
+            System.err.println("Delete directory failed: " + directory.getPath());
+        }
+        return dirDeleted;
 	}
 
 	/**
@@ -87,15 +110,21 @@ public class DirectoryUtils {
 		long size = 0;
 		if (directory.isDirectory()) {
 			File[] files = directory.listFiles();
-			for (File file : files) {
-				if (file.isFile()) {
-					size += file.length();
-				} else {
-					size += size(file);
-				}
-			}
-		}
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        size += file.length();
+                    } else {
+                        size += size(file);
+                    }
+                }
+            }
+        }
 		return size;
 	}
+
+    private static boolean isPathTraversal(String path) {
+        return path.contains("../") || path.contains("..\\") || path.startsWith("..") || path.contains("/..") || path.contains("\\..");
+    }
 
 }

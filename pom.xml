@@ -7,7 +7,7 @@
 
 	<groupId>com.deepkeepx.jar</groupId>
 	<artifactId>easy-utils</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>easy-utils</name>
 	<url>https://jar.deepkeepx.com/easy-utils/index.html</url>
 	<packaging>jar</packaging>

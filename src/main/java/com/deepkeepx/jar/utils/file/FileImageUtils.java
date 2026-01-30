@@ -1,5 +1,7 @@
 package com.deepkeepx.jar.utils.file;
 
+import com.deepkeepx.jar.utils.common.DirectoryUtils;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -147,10 +149,7 @@ public class FileImageUtils {
 		} else {
 			FileOutputStream fos = null;
 			try {
-				File dest = new File(savePath);
-				if (!dest.getParentFile().exists()) {
-					dest.getParentFile().mkdirs();
-				}
+                DirectoryUtils.mk(savePath);
 				fos = new FileOutputStream(savePath);
 				fos.write(data);
 				fos.flush();
